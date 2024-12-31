@@ -1,0 +1,29 @@
+broker: tcp://localhost:1883
+client_id: gpio-monitor
+monitor_time: 5s
+mqtt:
+  qos: 0
+  retain: false
+gpio:
+  digital-pins:
+    - gpio-name: led
+      pin: 1
+      mode: 1
+      state: false
+      topic: gpio/control/digital/1
+    - gpio-name: pir
+      pin: 2
+      mode: 0
+      state: false
+      topic: gpio/control/digital/2
+  analog-pins:
+    - gpio-name: bar
+      pin: 3
+      mode: 2
+      state: 0.0
+      topic: gpio/control/analog/3
+    - gpio-name: fig
+      pin: 4
+      mode: 2
+      state: 0.5
+      topic: gpio/control/analog/4
