@@ -34,20 +34,17 @@ func main() {
 		return
 	}
 	gpioHandler := services.NewGPIOHandler(mqttConfig, client)
-	gpioHandler.InitPins() // Call InitPins initially
+	gpioHandler.InitPins()
 
-	// Periodic task to call InitPins every 5 seconds
 	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
 
 	go func() {
 		for range ticker.C {
-			gpioHandler.InitPins() // Call every 5 seconds
-
+			gpioHandler.InitPins()
 		}
 	}()
 
-	// Graceful shutdown handling
 	defer client.Disconnect()
 	defer fmt.Println("Disconnected from MQTT broker")
 	sigChan := make(chan os.Signal, 1)

@@ -23,7 +23,6 @@ func main() {
 		log.Fatalf("Error connecting to MQTT broker: %v", token.Error())
 	}
 
-	// Publish the control message to change the pin state
 	token := client.Publish(topic, 1, false, message)
 	if token.Wait() && token.Error() != nil {
 		log.Printf("Error publishing message: %v", token.Error())
@@ -31,6 +30,5 @@ func main() {
 		fmt.Printf("Message sent to topic %s: %s\n", topic, message)
 	}
 
-	// Disconnect from MQTT broker
 	client.Disconnect(250)
 }
