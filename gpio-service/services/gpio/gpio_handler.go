@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"log"
 	"sync"
 	"time"
@@ -73,7 +74,7 @@ func (g *GpioHandler) EventHandlerDigital(pinNumber int, topic string) {
 		if token.Wait() && token.Error() != nil {
 			log.Printf("Error publishing message: %v", token.Error())
 		} else {
-			//	fmt.Printf("Message sent to topic %s\n", topic)
+			fmt.Printf("Message sent to topic %s\n", topic)
 		}
 		time.Sleep(g.Config.MonitorTime * time.Second)
 
@@ -113,7 +114,7 @@ func (g *GpioHandler) EventHandlerAnalog(pinNumber int, topic string) {
 		if token.Wait() && token.Error() != nil {
 			log.Printf("Error publishing message: %v", token.Error())
 		} else {
-			//		fmt.Printf("Message sent to topic %s\n", topic)
+			fmt.Printf("Message sent to topic %s\n", topic)
 		}
 		time.Sleep(g.Config.MonitorTime * time.Second)
 

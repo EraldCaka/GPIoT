@@ -26,9 +26,9 @@ func (c *ControlMessageHandler) HandleControlMessage() func(mqtt.Client, mqtt.Me
 	return func(client mqtt.Client, msg mqtt.Message) {
 		topic := msg.Topic()
 		payload := string(msg.Payload())
-		match, _ := regexp.MatchString(`^[0-9]*\.?[0-9]+$`, payload)
+		match, err := regexp.MatchString(`^[0-9]*\.?[0-9]+$`, payload)
 		if !match {
-			//	fmt.Printf("error: payload does not contain valid numeric data: %s\n", err)
+			fmt.Printf("error: payload does not contain valid numeric data: %s\n", err)
 			return
 		}
 		//	fmt.Printf("Received message from topic %s: %s\n", topic, payload)
@@ -105,7 +105,7 @@ func handleDigitalPin(client mqtt.Client, pin config.DigitalPinConfig, state int
 	if token.Wait() && token.Error() != nil {
 		log.Printf("Error publishing message: %v", token.Error())
 	} else {
-		//	fmt.Printf("Message sent to topic %s: \n", pin.Topic)
+		fmt.Printf("Message sent to topic %s: \n", pin.Topic)
 	}
 
 	return nil
@@ -130,7 +130,7 @@ func handleAnalogPin(client mqtt.Client, pin config.AnalogPinConfig, state float
 	if token.Wait() && token.Error() != nil {
 		log.Printf("Error publishing message: %v", token.Error())
 	} else {
-		//	fmt.Printf("Message sent to topic %s: \n", pin.Topic)
+		fmt.Printf("Message sent to topic %s: \n", pin.Topic)
 	}
 
 	return nil
