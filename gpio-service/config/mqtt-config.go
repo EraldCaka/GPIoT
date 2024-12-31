@@ -1,7 +1,9 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -30,9 +32,9 @@ type DigitalPinConfig struct {
 	Name  string       `yaml:"gpio-name"`
 	Pin   int          `yaml:"pin"`
 	Mode  gpio.PinMode `yaml:"mode"`
-	State bool         `yaml:"state"`
+	State int          `yaml:"state"`
 	Topic string       `yaml:"topic"`
-	//EventHandler DigitalEventHandler
+	Path  string       `yaml:"path"`
 }
 
 type AnalogPinConfig struct {
@@ -41,6 +43,7 @@ type AnalogPinConfig struct {
 	Mode  gpio.PinMode `yaml:"mode"`
 	State float64      `yaml:"state"`
 	Topic string       `yaml:"topic"`
+	Path  string       `yaml:"path"`
 }
 
 func NewMQTTConfig() *MQTTConfig {
@@ -51,7 +54,7 @@ func NewMQTTConfig() *MQTTConfig {
 		Retain:   false,
 		GPIO: GPIOConfig{
 			DigitalPins: []DigitalPinConfig{
-				{Name: "led", Pin: 1, Mode: gpio.Output, State: false},
+				{Name: "led", Pin: 1, Mode: gpio.Output, State: 0},
 			},
 			AnalogPins: []AnalogPinConfig{
 				{Name: "temperature-sensor", Pin: 0, Mode: gpio.Input, State: 0.0},
@@ -59,6 +62,25 @@ func NewMQTTConfig() *MQTTConfig {
 			},
 		},
 	}
+}
+
+type State interface {
+}
+
+type MQTTMessage struct {
+	Pin   int
+	State State
+	Type  gpio.PinType
+	Error string
+}
+
+func (m MQTTMessage) String() string {
+	payloadBytes, err := json.MarshalIndent(m, "", "  ")
+	if err != nil {
+		log.Printf("Error marshalling MQTT message: %v", err)
+		return ""
+	}
+	return string(payloadBytes)
 }
 
 func LoadMQTTConfig(filePath string) (*MQTTConfig, error) {

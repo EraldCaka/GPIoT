@@ -8,22 +8,26 @@ gpio:
   digital-pins:
     - gpio-name: led
       pin: 1
-      mode: 1
-      state: false
+      mode: 0
+      state: 0
+      path: gpio-mock-store/pin1.txt
       topic: gpio/control/digital/1
     - gpio-name: pir
       pin: 2
-      mode: 0
-      state: false
+      mode: 1
+      state: 0
+      path: gpio-mock-store/pin2.txt
       topic: gpio/control/digital/2
   analog-pins:
     - gpio-name: bar
       pin: 3
       mode: 2
       state: 0.0
+      path: gpio-mock-store/pin3.txt
       topic: gpio/control/analog/3
     - gpio-name: fig
       pin: 4
       mode: 2
       state: 0.5
+      path: gpio-mock-store/pin4.txt
       topic: gpio/control/analog/4

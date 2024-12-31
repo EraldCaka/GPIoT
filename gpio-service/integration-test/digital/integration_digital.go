@@ -9,7 +9,7 @@ import (
 
 func main() {
 	broker := "tcp://localhost:1883"
-	clientID := "gpio-monitor"
+	clientID := "gpio-monitor-test"
 	topic := "gpio/control/digital/1"
 	message := "1"
 
@@ -18,7 +18,6 @@ func main() {
 
 	client := mqtt.NewClient(opts)
 
-	// Connect to MQTT broker
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
 		log.Fatalf("Error connecting to MQTT broker: %v", token.Error())
 	}

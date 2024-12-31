@@ -2,6 +2,7 @@ package events
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/EraldCaka/GPIoT/gpio-service/config"
 
@@ -51,6 +52,7 @@ func (c *MQTTClient) Subscribe(topic string, callback mqtt.MessageHandler) error
 	if token.Wait() && token.Error() != nil {
 		return token.Error()
 	}
+	log.Printf("Successfully subscribed to topic: %s", topic)
 	return nil
 }
 

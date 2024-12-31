@@ -2,6 +2,9 @@ package gpio
 
 import (
 	"errors"
+	"fmt"
+	"log"
+	"os"
 	"sync"
 )
 
@@ -13,15 +16,17 @@ var (
 type DigitalPin struct {
 	pinNumber int
 	mode      PinMode
-	state     bool
+	state     int
+	path      string
 	mu        sync.Mutex
 }
 
-func NewDigitalPin(pinNumber int, mode PinMode, state bool) *DigitalPin {
+func NewDigitalPin(pinNumber int, mode PinMode, state int, path string) *DigitalPin {
 	return &DigitalPin{
 		pinNumber: pinNumber,
 		mode:      mode,
 		state:     state,
+		path:      path,
 	}
 }
 
@@ -35,22 +40,45 @@ func (p *DigitalPin) SetMode(mode PinMode) error {
 	return nil
 }
 
-func (p *DigitalPin) Read() (bool, error) {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	if p.mode != Input {
-		return false, errors.New("pin is not in out mode")
-	}
-	return p.state, nil
-}
-
-func (p *DigitalPin) Write(value bool) error {
+func (p *DigitalPin) Read() (int, error) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	if p.mode != Output {
+		return 0, errors.New("pin is not in output mode")
+	}
+
+	data, err := os.ReadFile(p.path)
+	if err != nil {
+		return 0, fmt.Errorf("error reading file: %w", err)
+	}
+
+	var state int
+	_, err = fmt.Sscanf(string(data), "%d", &state)
+	if err != nil {
+		return 0, fmt.Errorf("error parsing file content: %w", err)
+	}
+	if state < 0 || state > 1 {
+		return 0, fmt.Errorf("error state is not low/high (0 or 1) value!")
+	}
+	return state, nil
+}
+
+func (p *DigitalPin) Write(value int) error {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	if p.mode != Input {
 		return errors.New("pin is not in input mode")
 	}
+
+	data := []byte(fmt.Sprintf("%d", value))
+	err := os.WriteFile(p.path, data, 0644)
+	if err != nil {
+		return fmt.Errorf("error writing file: %w", err)
+	}
+
 	p.state = value
+	pins[p.pinNumber] = p
 	return nil
 }
 
@@ -85,7 +113,16 @@ func GetDigitalPin(pinNumber int) (*DigitalPin, error) {
 func RegisterDigitalPin(pinNumber int, pin *DigitalPin) {
 	pinsMu.Lock()
 	defer pinsMu.Unlock()
+
+	data := []byte(fmt.Sprintf("%d", pin.state))
+	err := os.WriteFile(pin.path, data, 0644)
+	if err != nil {
+		log.Println("error: couldnt write pin ", pinNumber, " inside the corresponding pin .txt file.", err)
+		return
+	}
+
 	pins[pinNumber] = pin
+
 }
 
 func GetAllDigitalPins() map[int]*DigitalPin {
